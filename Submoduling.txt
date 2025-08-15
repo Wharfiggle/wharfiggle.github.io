@@ -1,0 +1,3 @@
+To submodule a repo to another repo, navigate to the parent repo directory in cmd or Git Bash and use this command:
+
+git submodule add https://github.com/<User>/<ChildRepoName> <FolderName>
