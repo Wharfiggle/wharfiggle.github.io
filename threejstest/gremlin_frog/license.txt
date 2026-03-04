@@ -1,0 +1,11 @@
+Model Information:
+* title:	Gremlin Frog
+* source:	https://sketchfab.com/3d-models/gremlin-frog-d3a25fe99bb74d42b533deb4930fa885
+* author:	danduw (https://sketchfab.com/danduw)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Gremlin Frog" (https://sketchfab.com/3d-models/gremlin-frog-d3a25fe99bb74d42b533deb4930fa885) by danduw (https://sketchfab.com/danduw) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
