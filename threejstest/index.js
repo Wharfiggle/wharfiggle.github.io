@@ -3,13 +3,14 @@ import { OrbitControls } from "jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "jsm/loaders/GLTFLoader.js";
 
 
+//set up canvas
 let w = window.innerWidth;
 let h = window.innerHeight;
-
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(w, h);
 document.body.appendChild(renderer.domElement);
 
+//set up scene
 const fov = 75;
 const aspect = w / h;
 const near = 0.1;
@@ -18,35 +19,50 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 camera.position.z = 2;
 const scene = new THREE.Scene();
 
+//store wireMaterial for later manipulation
+const wireMaterial = new THREE.MeshBasicMaterial({
+    color: "white",
+    wireframe: true,
+    transparent: true,
+    opacity: 1
+});
+
 //gltf loader
 const modelLoader = new GLTFLoader();
 modelLoader.load(
     "./gremlin_frog/scene.gltf",
-    function(gltf) { scene.add(gltf.scene) }
+    function(gltf)
+    {
+        gltf.scene.traverse( (child) => {
+            if(child.isMesh)
+            {
+                const wireMesh = new THREE.Mesh(child.geometry, wireMaterial);
+                wireMesh.scale.setScalar(1.001);
+                scene.add(wireMesh);
+            }
+        });
+        scene.add(gltf.scene)
+    }
 )
 
+//orbit controls
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.03;
 
-/*const geo = new THREE.IcosahedronGeometry(1.0, 2);
-const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, flatShading: true });
-const mesh = new THREE.Mesh(geo, mat);
-scene.add(mesh);
-
-const wireMat = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
-const wireMesh = new THREE.Mesh(geo, wireMat);
-wireMesh.scale.setScalar(1.001);
-mesh.add(wireMesh);*/
-
-const hemiLight = new THREE.HemisphereLight(0xffffff, 0x000000);
+//lighting
+const hemiLight = new THREE.HemisphereLight("white", "black");
 scene.add(hemiLight);
 
 
-function animate()
+//tick
+function animate(t = 0)
 {
     requestAnimationFrame(animate);
     
+    //pulse wireMaterial opacity
+    wireMaterial.opacity = Math.sin(t * 0.001) / 2;
+
     //adapt to resized window
     if(window.innerWidth != w || window.innerHeight != h)
     {
