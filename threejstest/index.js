@@ -19,12 +19,27 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 camera.position.z = 2;
 const scene = new THREE.Scene();
 
-//store wireMaterial for later manipulation
-const wireMaterial = new THREE.MeshBasicMaterial({
-    color: "white",
+//store materials for later manipulation
+const wobbleMaterial = new THREE.ShaderMaterial({
+    uniforms: { uTime:{value:0}, uTexture:{value:null} },
+    vertexShader: `uniform float uTime;
+        varying vec2 vUv;
+        void main() { vUv = uv;
+            vec3 p = position;
+            p.y += sin(p.x * 10.0 + uTime) * 0.1;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(p,1.0);
+        }`,
+    fragmentShader: `uniform sampler2D uTexture;
+        varying vec2 vUv;
+        void main() { gl_FragColor = texture2D(uTexture, vUv); }`
+});
+const wireMaterial = new THREE.ShaderMaterial({
     wireframe: true,
     transparent: true,
-    opacity: 1
+    uniforms: { uTime:{value:0}, uOpacity:{value:1.0} },
+    vertexShader: wobbleMaterial.vertexShader,
+    fragmentShader: `uniform float uOpacity;
+        void main() { gl_FragColor = vec4(vec3(1.0, 1.0, 1.0), uOpacity); }`
 });
 
 //gltf loader
@@ -39,6 +54,9 @@ modelLoader.load(
                 const wireMesh = new THREE.Mesh(child.geometry, wireMaterial);
                 wireMesh.scale.setScalar(1.001);
                 scene.add(wireMesh);
+                
+                wobbleMaterial.uniforms.uTexture.value = child.material.map;
+                child.material = wobbleMaterial;
             }
         });
         scene.add(gltf.scene)
@@ -61,7 +79,9 @@ function animate(t = 0)
     requestAnimationFrame(animate);
     
     //pulse wireMaterial opacity
-    wireMaterial.opacity = Math.sin(t * 0.001) / 2;
+    wireMaterial.uniforms.uOpacity.value = Math.sin(t * 0.001) / 2;
+    wireMaterial.uniforms.uTime.value = t * 0.001;
+    wobbleMaterial.uniforms.uTime.value = t * 0.001;
 
     //adapt to resized window
     if(window.innerWidth != w || window.innerHeight != h)
