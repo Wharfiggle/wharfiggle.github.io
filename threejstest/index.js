@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "jsm/loaders/GLTFLoader.js";
+import { ease } from "./ease.js";
 
 
 //set up canvas
@@ -56,7 +57,7 @@ wobbleMaterial.onBeforeCompile = (shader) =>
 const seeMaterial = new THREE.MeshStandardMaterial({ color: "purple", flatShading: true });
 seeMaterial.onBeforeCompile = (shader) =>
 {
-    shader.uniforms.uObscured = { value: true };
+    shader.uniforms.uObscured = { value: false };
     shader.uniforms.uCullPoint = { value: new THREE.Vector3(0, 0, 0) };
     shader.uniforms.uCullRadius = { value: 50.0 };
     shader.uniforms.uResolution = { value: new THREE.Vector2(w, h) };
