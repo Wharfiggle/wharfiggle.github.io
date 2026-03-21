@@ -57,7 +57,7 @@ wobbleMaterial.onBeforeCompile = (shader) =>
 const seeMaterial = new THREE.MeshStandardMaterial({ color: "purple", flatShading: true });
 seeMaterial.onBeforeCompile = (shader) =>
 {
-    shader.uniforms.uObscured = { value: false };
+    shader.uniforms.uObscured = { value: true };
     shader.uniforms.uCullPoint = { value: new THREE.Vector3(0, 0, 0) };
     shader.uniforms.uCullRadius = { value: 50.0 };
     shader.uniforms.uResolution = { value: new THREE.Vector2(w, h) };
@@ -150,9 +150,13 @@ obst.position.z = -2;
 
 
 //tick
+let frogHole = 0;
+let lastTime = 0;
 function animate(t = 0)
 {
     requestAnimationFrame(animate);
+    let dt = t - lastTime;
+    lastTime = t;
     
     //pulse wireMaterial opacity
     wireMaterial.uniforms.uOpacity.value = Math.sin(t * 0.001) / 2;
@@ -182,15 +186,17 @@ function animate(t = 0)
         raycaster.far = camToPoint.length();
         const intersects = raycaster.intersectObjects([ obst ], true);
         const obscured = intersects.length > 0;
-        seeMaterial.userData.shader.uniforms.uObscured.value = obscured;
+        //seeMaterial.userData.shader.uniforms.uObscured.value = obscured;
 
         //size cullRadius relative to world size of object
-        if(obscured)
+        frogHole = ease(frogHole, dt, 1, obscured);
+        console.log(frogHole);
+        if(frogHole > 0)
         {
             const distance = camToPoint.dot(camera.getWorldDirection(new THREE.Vector3()));
             const fovr = camera.fov * (Math.PI / 180); //radians
             const radiusPixels = (2.5 * h) / (2 * Math.tan(fovr / 2) * distance);
-            seeMaterial.userData.shader.uniforms.uCullRadius.value = radiusPixels;
+            seeMaterial.userData.shader.uniforms.uCullRadius.value = radiusPixels * frogHole;
         }
     }
 
