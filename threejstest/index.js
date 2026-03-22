@@ -57,9 +57,8 @@ wobbleMaterial.onBeforeCompile = (shader) =>
 const seeMaterial = new THREE.MeshStandardMaterial({ color: "purple", flatShading: true });
 seeMaterial.onBeforeCompile = (shader) =>
 {
-    shader.uniforms.uObscured = { value: true };
     shader.uniforms.uCullPoint = { value: new THREE.Vector3(0, 0, 0) };
-    shader.uniforms.uCullRadius = { value: 50.0 };
+    shader.uniforms.uCullRadius = { value: 0.0 };
     shader.uniforms.uResolution = { value: new THREE.Vector2(w, h) };
 
     //pass clip position and projection matrix to fragment shader
@@ -75,7 +74,6 @@ seeMaterial.onBeforeCompile = (shader) =>
     //pass uniforms and varyings
     shader.fragmentShader = `varying vec4 vClipPosition;
         varying mat4 vProjectionMatrix;
-        uniform bool uObscured;
         uniform vec3 uCullPoint;
         uniform float uCullRadius;
         uniform vec2 uResolution;
@@ -84,15 +82,14 @@ seeMaterial.onBeforeCompile = (shader) =>
     //cut see-through hole
     shader.fragmentShader = shader.fragmentShader.replace(
         "#include <clipping_planes_fragment>", `#include <clipping_planes_fragment>
-        if(uObscured) {
-            vec4 cullClip = vProjectionMatrix * viewMatrix * vec4(uCullPoint, 1.0);
-            vec2 cullNDC = cullClip.xy / cullClip.w;
-            vec2 fragNDC = vClipPosition.xy / vClipPosition.w;
-            //correct for aspect ratio
-            vec2 cullCorrected = vec2(cullNDC.x * (uResolution.x / uResolution.y), cullNDC.y);
-            vec2 fragCorrected = vec2(fragNDC.x * (uResolution.x / uResolution.y), fragNDC.y);
-            float radiusNDC = uCullRadius / uResolution.y;
-            if(distance(fragCorrected, cullCorrected) < radiusNDC) discard; }
+        vec4 cullClip = vProjectionMatrix * viewMatrix * vec4(uCullPoint, 1.0);
+        vec2 cullNDC = cullClip.xy / cullClip.w;
+        vec2 fragNDC = vClipPosition.xy / vClipPosition.w;
+        //correct for aspect ratio
+        vec2 cullCorrected = vec2(cullNDC.x * (uResolution.x / uResolution.y), cullNDC.y);
+        vec2 fragCorrected = vec2(fragNDC.x * (uResolution.x / uResolution.y), fragNDC.y);
+        float radiusNDC = uCullRadius / uResolution.y;
+        if(distance(fragCorrected, cullCorrected) < radiusNDC) discard;
         `);
 
     //store for later access
@@ -186,18 +183,20 @@ function animate(t = 0)
         raycaster.far = camToPoint.length();
         const intersects = raycaster.intersectObjects([ obst ], true);
         const obscured = intersects.length > 0;
-        //seeMaterial.userData.shader.uniforms.uObscured.value = obscured;
 
-        //size cullRadius relative to world size of object
-        frogHole = ease(frogHole, dt, 1, obscured);
+        //size cullRadius relative to world size of object + easing
+        const prevFrogHole = frogHole;
+        frogHole = ease(frogHole, dt, 0.5, obscured);
         console.log(frogHole);
         if(frogHole > 0)
         {
             const distance = camToPoint.dot(camera.getWorldDirection(new THREE.Vector3()));
-            const fovr = camera.fov * (Math.PI / 180); //radians
-            const radiusPixels = (2.5 * h) / (2 * Math.tan(fovr / 2) * distance);
+            const fovRad = camera.fov * (Math.PI / 180);
+            const radiusPixels = (2.5 * h) / (2 * Math.tan(fovRad / 2) * distance);
             seeMaterial.userData.shader.uniforms.uCullRadius.value = radiusPixels * frogHole;
         }
+        else if(prevFrogHole > 0)
+            seeMaterial.userData.shader.uniforms.uCullRadius.value = 0;
     }
 
     //adapt to resized window
