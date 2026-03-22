@@ -77,6 +77,8 @@ seeMaterial.onBeforeCompile = (shader) =>
         uniform vec3 uCullPoint;
         uniform float uCullRadius;
         uniform vec2 uResolution;
+        
+        float noiseRand(vec2 co) { return fract(sin(dot(co.xy, vec2(12.9898,78.233))) * 43758.5453); }
         ` + shader.fragmentShader;
 
     //cut see-through hole
@@ -85,11 +87,17 @@ seeMaterial.onBeforeCompile = (shader) =>
         vec4 cullClip = vProjectionMatrix * viewMatrix * vec4(uCullPoint, 1.0);
         vec2 cullNDC = cullClip.xy / cullClip.w;
         vec2 fragNDC = vClipPosition.xy / vClipPosition.w;
+        
         //correct for aspect ratio
         vec2 cullCorrected = vec2(cullNDC.x * (uResolution.x / uResolution.y), cullNDC.y);
         vec2 fragCorrected = vec2(fragNDC.x * (uResolution.x / uResolution.y), fragNDC.y);
         float radiusNDC = uCullRadius / uResolution.y;
-        if(distance(fragCorrected, cullCorrected) < radiusNDC) discard;
+        
+        //noisy dithered edge
+        float dist = distance(fragCorrected, cullCorrected);
+        float alpha = smoothstep(radiusNDC, radiusNDC - 0.05, dist);
+        float noise = noiseRand(gl_FragCoord.xy);
+        if(noise < alpha) discard;
         `);
 
     //store for later access
