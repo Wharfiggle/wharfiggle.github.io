@@ -20,6 +20,10 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 camera.position.z = 3;
 const scene = new THREE.Scene();
 
+const clickRaycaster = new THREE.Raycaster();
+const frogRaycaster = new THREE.Raycaster();
+const frogRadius = 2.5;
+
 //store materials for later manipulation
 
 //wireframe mesh material
@@ -154,6 +158,55 @@ scene.add(obst);
 obst.position.z = -2;
 
 
+//click and drag obst
+let dragging = null;
+const dragPlane = new THREE.Plane();
+
+//convert to normalized device coordinates (NDC) (-1 to 1)
+function getMouseCoordinates(event)
+{
+    let mousex = (event.clientX / window.innerWidth) * 2 - 1;
+    let mousey = 1 - (event.clientY / window.innerHeight) * 2;
+    return new THREE.Vector3(mousex, mousey);
+}
+
+window.addEventListener("mousedown", event => {
+    clickRaycaster.setFromCamera(getMouseCoordinates(event), camera);
+    const intersects = clickRaycaster.intersectObjects([ obst ], true);
+    
+    if(intersects.length > 0)
+    {
+        let intersection = intersects[0];
+        let obj = intersection.object;
+        let offset = intersection.point.clone().sub(obj.position);
+        dragging = { obj: obj, offset: offset };
+
+        //create plane flat to the camera to drag on
+        dragPlane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(new THREE.Vector3()), intersection.point);
+        
+        //disable orbit controls
+        controls.enabled = false;
+    }
+});
+
+window.addEventListener("mousemove", event => {
+    if(!dragging)
+        return;
+
+    clickRaycaster.setFromCamera(getMouseCoordinates(event), camera);
+    let intersection = new THREE.Vector3();
+    clickRaycaster.ray.intersectPlane(dragPlane, intersection);
+    
+    intersection.sub(dragging.offset);
+    dragging.obj.position.copy(intersection);
+});
+
+window.addEventListener("mouseup", event => {
+    dragging = null;
+    controls.enabled = true;
+});
+
+
 //tick
 let frogHole = 0;
 let lastTime = 0;
@@ -186,21 +239,19 @@ function animate(t = 0)
         const camToPoint = frog.position.clone().sub(camera.position);
 
         //see if frog is obscured and needs see-through cut-out
-        const raycaster = new THREE.Raycaster();
-        raycaster.set(camera.position, camToPoint.clone().normalize());
-        raycaster.far = camToPoint.length();
-        const intersects = raycaster.intersectObjects([ obst ], true);
+        frogRaycaster.set(camera.position, camToPoint.clone().normalize());
+        frogRaycaster.far = camToPoint.length();
+        const intersects = frogRaycaster.intersectObjects([ obst ], true);
         const obscured = intersects.length > 0;
 
         //size cullRadius relative to world size of object + easing
         const prevFrogHole = frogHole;
         frogHole = ease(frogHole, dt, 0.5, obscured);
-        console.log(frogHole);
         if(frogHole > 0)
         {
             const distance = camToPoint.dot(camera.getWorldDirection(new THREE.Vector3()));
             const fovRad = camera.fov * (Math.PI / 180);
-            const radiusPixels = (2.5 * h) / (2 * Math.tan(fovRad / 2) * distance);
+            const radiusPixels = (frogRadius * h) / (2 * Math.tan(fovRad / 2) * distance);
             seeMaterial.userData.shader.uniforms.uCullRadius.value = radiusPixels * frogHole;
         }
         else if(prevFrogHole > 0)
