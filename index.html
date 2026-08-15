@@ -1,12 +1,70 @@
 <html>
-    <body>
-        <h1>hi here's some cool stuff:</h1>
-        <a href="Nucleus">ThreeJS Ball Defender</a>
-        <div></div>
-        <a href="Nucleus/indexold.html">Ball Defender 2D</a>
-        <div></div>
-        <a href="threejstest/index.html">Three.js test</a>
-        <h3>-wharfiggle</h3>
-        <iframe src="Nucleus/index.html?paddle=rgb(0,255,0)&defaultScore=0,255,0&showScore=false" width="800" height="600"></iframe>
+    <style>
+        .fill { position:fixed; width:100%; height:100%; inset:0; overflow:hidden; pointer-events:none; touch-action:none; z-index:-1 }
+        h1, h2, h3 { color:white }
+        #backgroundGame { border:none; z-index:-2 }
+        #darken { background-color:rgba(0,0,0,0.2) }
+        #vignetteBlur { 
+            backdrop-filter:blur(12px);
+            mask-image:radial-gradient(circle, transparent 20%, black 80%);
+        }
+        #container { max-width:75rem; margin-inline:auto; padding-inline:1.5rem; height:200%; }
+        #subcontainer { display:inline-block; border:4px solid white; border-radius:20px; margin:10px; padding:20px; background-color:rgba(0,0,0,0.5); backdrop-filter:blur(12px) }
+    </style>
+    <body style="background-color:black">
+        <iframe class="fill" id="backgroundGame" src="Nucleus/index.html?showScore=false"></iframe>
+        <div class="fill" id="vignetteBlur"></div>
+        <div class="fill" id="darken"></div>
+        <div id="container">
+            <div id="subcontainer">
+                <h1>hi here's some cool stuff:</h1>
+                <a href="Nucleus">ThreeJS Ball Defender</a>
+                <div></div>
+                <a href="Nucleus/indexold.html">Ball Defender 2D</a>
+                <div></div>
+                <a href="threejstest/index.html">Three.js test</a>
+                <h3>-wharfiggle</h3>
+            </div>
+        </div>
     </body>
+    <script>
+        const iframe = document.getElementById("backgroundGame");
+        
+        //handle mouse input
+        document.addEventListener("mousemove", event => {
+            sendMouseEvent(event);
+        });
+        
+        //handle touch input
+        document.addEventListener("touchmove", handleTouch, { passive: false });
+        document.addEventListener("touchstart", handleTouch, { passive: false });
+        function handleTouch(event)
+        {
+            const touchEvent = event.touches[0];
+            sendMouseEvent(touchEvent);
+        }
+
+        //handle scroll input
+        window.addEventListener("scroll", (event) => {
+            sendScrollEvent();
+        });
+
+        //send mouse/touch input to iframe as message
+        function sendMouseEvent(event)
+        {
+            iframe.contentWindow.postMessage({
+                type: "mouseEvent",
+                clientX: event.clientX,
+                clientY: event.clientY
+            });
+        }
+        function sendScrollEvent()
+        {
+            iframe.contentWindow.postMessage({
+                type:"scrollEvent",
+                scrollY: window.scrollY,
+                height: document.documentElement.scrollHeight - window.innerHeight
+            })
+        }
+    </script>
 </html>
