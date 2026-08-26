@@ -1,21 +1,20 @@
 <html>
     <style>
-        .fill { position:fixed; width:100%; height:100%; inset:0; overflow:hidden; pointer-events:none; touch-action:none; z-index:-1 }
+        body { background-color:rgb(0, 20, 0) }
         h1, h2, h3 { color:white }
-        #backgroundGame { border:none; z-index:-2 }
-        #darken { background-color:rgba(0,0,0,0.2) }
-        #vignetteBlur { 
-            backdrop-filter:blur(12px);
-            mask-image:radial-gradient(circle, transparent 20%, black 80%);
-        }
         #container { max-width:75rem; margin-inline:auto; padding-inline:1.5rem; height:200%; }
-        #subcontainer { display:inline-block; border:4px solid white; border-radius:20px; margin:10px; padding:20px; background-color:rgba(0,0,0,0.5); backdrop-filter:blur(12px) }
+        #subcontainer { display:inline-block; border:4px solid white; border-radius:20px; margin:10px; padding:20px; background-color:rgba(0,0,0,0.5) }
+        #game { border:none; position: absolute; top:23%; left:34%; width: 30.5%; height: 50%; transform: skewY(-10deg) }
+        #gameWrapper { z-index:-1; position:absolute; inset:0; width:100%; height:auto; mask:url("./ScreenMask.png") 0 0 / 100% 100% no-repeat; mask-mode:luminance }
     </style>
-    <body style="background-color:black">
-        <iframe class="fill" id="backgroundGame" src="Nucleus/index.html?showScore=false"></iframe>
-        <div class="fill" id="vignetteBlur"></div>
-        <div class="fill" id="darken"></div>
+    <body>
         <div id="container">
+            <div style="position:relative">
+                <img style="width:100%; height:auto" src="./Monitor.png">
+                <div id="gameWrapper">
+                    <iframe id="game" src="Nucleus/index.html?showScore=false"></iframe>
+                </div>
+            </div>
             <div id="subcontainer">
                 <h1>hi here's some cool stuff:</h1>
                 <a href="Nucleus">ThreeJS Ball Defender</a>
@@ -27,44 +26,4 @@
             </div>
         </div>
     </body>
-    <script>
-        const iframe = document.getElementById("backgroundGame");
-        
-        //handle mouse input
-        document.addEventListener("mousemove", event => {
-            sendMouseEvent(event);
-        });
-        
-        //handle touch input
-        document.addEventListener("touchmove", handleTouch, { passive: false });
-        document.addEventListener("touchstart", handleTouch, { passive: false });
-        function handleTouch(event)
-        {
-            const touchEvent = event.touches[0];
-            sendMouseEvent(touchEvent);
-        }
-
-        //handle scroll input
-        window.addEventListener("scroll", (event) => {
-            sendScrollEvent();
-        });
-
-        //send mouse/touch input to iframe as message
-        function sendMouseEvent(event)
-        {
-            iframe.contentWindow.postMessage({
-                type: "mouseEvent",
-                clientX: event.clientX,
-                clientY: event.clientY
-            });
-        }
-        function sendScrollEvent()
-        {
-            iframe.contentWindow.postMessage({
-                type:"scrollEvent",
-                scrollY: window.scrollY,
-                height: document.documentElement.scrollHeight - window.innerHeight
-            })
-        }
-    </script>
 </html>
