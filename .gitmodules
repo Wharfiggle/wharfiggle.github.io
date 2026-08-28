@@ -1,3 +1,6 @@
 [submodule "BallDefender"]
 	path = Nucleus
 	url = https://github.com/Wharfiggle/BallDefender
+[submodule "Dollhouse"]
+	path = Dollhouse
+	url = https://github.com/Wharfiggle/Dollhouse
