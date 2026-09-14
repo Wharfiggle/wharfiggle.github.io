@@ -1,31 +1,43 @@
 <html>
     <style>
         body { background-color:rgb(0, 20, 0) }
-        h1, h2, h3 { color:white }
-        #container { max-width:75rem; margin-inline:auto; padding-inline:1.5rem; height:200%; }
-        #subcontainer { display:inline-block; border:4px solid white; border-radius:20px; margin:10px; padding:20px; background-color:rgba(0,0,0,0.5) }
+        h1, h2, h3 { color:rgb(200,255,200) }
+        h1 { font-family:monospace; font-size:5vh; font-weight:bolder; margin:0 }
+        a:link, a:visited { color:#00ff73; font-weight:bold; }
+        a:hover, a:active { color:#009643;}
+        #container { max-width:75rem; margin-inline:auto; padding-inline:1.5rem; height:auto; }
+        #subcontainer { display:inline-block; border:4px solid rgba(200,255,200,0.5); border-radius:20px; margin:10px; padding:20px; background-color:rgba(0,0,0,0.5) }
         #game { border:none; position: absolute; top:23%; left:34%; width: 30.5%; height: 50%; transform: skewY(-10deg) }
         #gameWrapper { z-index:-1; position:absolute; inset:0; width:100%; height:auto; mask:url("./ScreenMask.png") 0 0 / 100% 100% no-repeat; mask-mode:luminance }
     </style>
     <body>
         <div id="container">
+            <div id="subcontainer" style="display:flex; justify-content:space-between;">
+                <div style="display:flex; flex-direction:column; padding-left:20px">
+                    <h1>E L I J A H</h1>
+                    <h1>S O U T H M A N</h1>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:20px; font-size:larger">
+                    <a href="mailto:elijahsouthman@gmail.com">elijahsouthman@gmail.com</a>
+                    <a href="https://github.com/Wharfiggle">github.com/ wharfiggle</a>
+                    <a href="https://www.linkedin.com/in/elijahsouthman">linkedin.com/ elijahsouthman</a>
+                </div>
+            </div>
             <div style="position:relative">
                 <img style="width:100%; height:auto" src="./Monitor.png">
                 <div id="gameWrapper">
                     <iframe id="game" src="Nucleus/index.html?showScore=false"></iframe>
                 </div>
             </div>
+            <div style="display:flex; justify-content:center;">
             <div id="subcontainer">
-                <h1>hi here's some cool stuff:</h1>
-                <a href="Nucleus">Nucleus</a>
-                <div></div>
-                <a href="Nucleus/indexold.html">Ball Defender</a>
-                <div></div>
-                <a href="threejstest/index.html">Three.js test</a>
-                <div></div>
-                <a href="Dollhouse">Dollhouse</a>
-                <h3>-wharfiggle</h3>
-            </div>
+                <div style="display:flex; flex-direction:column; gap:20px">
+                    <a href="Nucleus">Nucleus</a>
+                    <a href="Nucleus/indexold.html">Ball Defender</a>
+                    <a href="threejstest/index.html">Three.js test</a>
+                    <a href="Dollhouse">Dollhouse</a>
+                </div>
+            </div></div>
         </div>
     </body>
 </html>
