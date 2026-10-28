@@ -2,20 +2,29 @@
     <style>
         body { background-color:rgb(0, 20, 0) }
         h1, h2, h3 { color:rgb(200,255,200) }
-        h1 { font-family:monospace; font-size:5vh; font-weight:bolder; margin:0 }
+        h1 { font-family:monospace; font-size:3rem; font-weight:bolder; margin:0 }
         a:link, a:visited { color:#00ff73; font-weight:bold; }
         a:hover, a:active { color:#009643;}
         #container { max-width:75rem; margin-inline:auto; padding-inline:1.5rem; height:auto; }
-        #subcontainer { display:inline-block; border:4px solid rgba(200,255,200,0.5); border-radius:20px; margin:10px; padding:20px; background-color:rgba(0,0,0,0.5) }
-        #game { border:none; position: absolute; top:23%; left:34%; width: 30.5%; height: 50%; transform: skewY(-10deg) }
+        #subcontainer { display:inline-block; border:0.2rem solid rgba(200,255,200,0.5); border-radius:1.5rem; margin:1rem; padding:1.8rem; background-color:rgba(0,0,0,0.5) }
+        #game { border:none; position: absolute; top:19%; left:42%; width: 46.5%; height: 52.5%; transform: skewY(-10deg) }
         #gameWrapper { z-index:-1; position:absolute; inset:0; width:100%; height:auto; mask:url("./ScreenMask.png") 0 0 / 100% 100% no-repeat; mask-mode:luminance }
+        .name.wide { display: inline; }
+        .name.small { display: none; }
+        @media (max-width: 900px)
+        {
+            .name.wide { display: none; }
+            .name.small { display: inline; }
+        }
     </style>
     <body>
         <div id="container">
             <div id="subcontainer" style="display:flex; justify-content:space-between;">
                 <div style="display:flex; flex-direction:column; padding-left:20px">
-                    <h1>E L I J A H</h1>
-                    <h1>S O U T H M A N</h1>
+                    <h1 class="name wide">E L I J A H</h1>
+                    <h1 class="name wide">S O U T H M A N</h1>
+                    <h1 class="name small">E</h1>
+                    <h1 class="name small">S</h1>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:20px; font-size:larger">
                     <a href="mailto:elijahsouthman@gmail.com">elijahsouthman@gmail.com</a>
@@ -30,14 +39,13 @@
                 </div>
             </div>
             <div style="display:flex; justify-content:center;">
-            <div id="subcontainer">
-                <div style="display:flex; flex-direction:column; gap:20px">
+                <div id="subcontainer" style="display:flex; flex-direction:column; gap:2rem; font-size:1.5rem; align-items:center; padding:2.5rem">
                     <a href="Nucleus">Nucleus</a>
                     <a href="Nucleus/indexold.html">Ball Defender</a>
                     <a href="threejstest/index.html">Three.js test</a>
                     <a href="Dollhouse">Dollhouse</a>
                 </div>
-            </div></div>
+            </div>
         </div>
     </body>
 </html>
